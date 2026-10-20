@@ -1,0 +1,12 @@
+[Unit]
+Description=PortSentinel exposure scan
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/portsentinel apply --yes -c /etc/portsentinel/config.yaml
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/portsentinel /var/log/portsentinel
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_DAC_READ_SEARCH CAP_SYS_PTRACE
