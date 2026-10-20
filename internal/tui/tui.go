@@ -333,8 +333,8 @@ func (m Model) viewFindings() string {
 		return allowStyle.Render("No open ports found on " + strings.Join(m.rep.Addresses, ", "))
 	}
 	var b strings.Builder
-	row := "%-3s %-24s %-9s %-14s %-18s %-10s %s"
-	b.WriteString(headerStyle.Render(fmt.Sprintf(row, "", "TARGET", "PORT", "SERVICE", "PROCESS", "VERDICT", "REASON")) + "\n")
+	row := "%s %s %-24s %-9s %-14s %-18s %-10s %s"
+	b.WriteString(headerStyle.Render(fmt.Sprintf(row, " ", " ", "TARGET", "PORT", "SERVICE", "PROCESS", "VERDICT", "REASON")) + "\n")
 	for i, f := range m.rep.Findings {
 		var vs lipgloss.Style
 		icon := "●"
@@ -350,11 +350,12 @@ func (m Model) viewFindings() string {
 		if f.PID > 0 {
 			proc = fmt.Sprintf("%s[%d]", f.Process, f.PID)
 		}
-		line := fmt.Sprintf(row, vs.Render(icon), f.Target, fmt.Sprintf("%d/%s", f.Port, f.Proto),
-			orDash(f.Service), orDash(proc), vs.Render(fmt.Sprintf("%-10s", f.Verdict)), f.Reason)
+		marker := " "
 		if i == m.cursor {
-			line = selStyle.Render(line)
+			marker = selStyle.Render("›")
 		}
+		line := fmt.Sprintf(row, marker, vs.Render(icon), f.Target, fmt.Sprintf("%d/%s", f.Port, f.Proto),
+			orDash(f.Service), orDash(proc), vs.Render(fmt.Sprintf("%-10s", f.Verdict)), f.Reason)
 		b.WriteString(line + "\n")
 	}
 	if f := m.rep.Findings[m.cursor]; f.Banner != "" {

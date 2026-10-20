@@ -2,6 +2,20 @@
 
 External port exposure detection and automated nftables enforcement for Linux servers, written in Go.
 
+## Screenshots
+
+| Findings | Plan |
+|---|---|
+| ![Findings](docs/screenshots/03-findings.png) | ![Plan](docs/screenshots/04-plan.png) |
+| **Apply confirmation** | **Timed keep-or-revert** |
+| ![Apply](docs/screenshots/05-apply-confirm.png) | ![Keep or revert](docs/screenshots/06-keep-or-revert.png) |
+
+Regenerate: `PS_SCREENSHOT_DIR=out go test ./internal/tui -run Screenshots` (dumps ANSI frames).
+
+## Install
+
+Download a binary from [Releases](https://github.com/bakhod1r/portsentinel/releases), or build:
+
 ## Build
 
 ```sh
@@ -54,3 +68,6 @@ policy:
 ```
 
 See [docs/PLAN.md](docs/PLAN.md) for the roadmap. systemd units are in `deploy/`.
+
+## Known issues (v0.1.0)
+- `apply` verifies from the same host; that traffic arrives over `lo`, which the managed chain accepts, so verification fails and the change is auto-reverted. Use `audit`, `plan` and `tui` for now.

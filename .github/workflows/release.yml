@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go vet ./... && go test ./...
+      - name: Build
+        run: |
+          mkdir dist
+          for arch in amd64 arm64; do
+            out=portsentinel_${GITHUB_REF_NAME}_linux_${arch}
+            CGO_ENABLED=0 GOOS=linux GOARCH=$arch go build -trimpath \
+              -ldflags "-s -w" -o "$out/portsentinel" ./cmd/portsentinel
+            cp README.md LICENSE "$out/" && cp -r deploy "$out/"
+            tar -czf "dist/$out.tar.gz" "$out"
+          done
+          (cd dist && sha256sum *.tar.gz > checksums.txt)
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --title "PortSentinel $GITHUB_REF_NAME" \
+            --prerelease --generate-notes \
+            --notes "Early MVP. Use audit/plan/tui modes; apply's same-host verification is a known issue (see README)."
