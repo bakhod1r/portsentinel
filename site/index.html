@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PortSentinel</title>
+<meta name="description" content="External port exposure detection and automated nftables enforcement for Linux servers.">
+<style>
+:root{--bg:#0f0f17;--panel:#181825;--fg:#cdd6f4;--muted:#9399b2;--accent:#8b6cf6;--ok:#a6e3a1;--bad:#f38ba8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:48px 16px}
+h1{font-size:clamp(2rem,5vw,3.2rem);margin:0}h1 span{color:var(--accent)}
+.lead{color:var(--muted);font-size:1.15rem;max-width:680px}
+.btns a{display:inline-block;margin:8px 8px 0 0;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600}
+.p{background:var(--accent);color:#fff}.s{border:1px solid #45475a;color:var(--fg)}
+pre{background:var(--panel);padding:16px;border-radius:10px;overflow-x:auto;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:32px 0}
+.card{background:var(--panel);border-radius:10px;padding:18px}.card h3{margin:0 0 6px;font-size:1rem}.card p{margin:0;color:var(--muted);font-size:.95rem}
+img{width:100%;border-radius:10px;margin:12px 0}
+h2{margin-top:48px}footer{color:var(--muted);font-size:.9rem;margin-top:48px}
+.warn{border-left:3px solid var(--bad);padding:8px 14px;background:var(--panel);border-radius:6px}
+</style>
+</head>
+<body><main>
+<h1>Port<span>Sentinel</span></h1>
+<p class="lead">Finds externally exposed ports on your Linux servers, checks them against a default-deny policy, and closes the gap with safe, reversible nftables rules.</p>
+<div class="btns">
+<a class="p" href="https://github.com/bakhod1r/portsentinel/releases/latest">Download</a>
+<a class="s" href="https://github.com/bakhod1r/portsentinel">GitHub</a>
+</div>
+
+<img src="screenshots/03-findings.png" alt="PortSentinel TUI findings view">
+
+<div class="grid">
+<div class="card"><h3>No Nmap required</h3><p>Concurrent TCP probes, IPv4/IPv6, banner grabbing and process mapping via /proc.</p></div>
+<div class="card"><h3>Default-deny policy</h3><p>Allowlists, ranges, expiring exceptions. SSH and management ports are always protected.</p></div>
+<div class="card"><h3>Safe enforcement</h3><p>Own nftables table only, validated with <code>nft -c</code>, atomic apply, timed auto-revert and rollback.</p></div>
+<div class="card"><h3>Auditable</h3><p>Every scan, apply and rollback is written to a JSON Lines audit log.</p></div>
+</div>
+
+<h2>Quick start</h2>
+<pre>curl -LO https://github.com/bakhod1r/portsentinel/releases/latest/download/portsentinel_v0.1.0_linux_amd64.tar.gz
+tar xzf portsentinel_v0.1.0_linux_amd64.tar.gz && cd portsentinel_v0.1.0_linux_amd64
+sudo ./portsentinel init
+sudo ./portsentinel audit
+sudo ./portsentinel tui</pre>
+
+<h2>Plan before you apply</h2>
+<img src="screenshots/04-plan.png" alt="Plan view with nftables ruleset">
+<p class="warn">v0.1.0 is a preview: use <code>audit</code>, <code>plan</code> and <code>tui</code>. Same-host verification in <code>apply</code> is a known issue.</p>
+
+<footer>MIT licensed · <a style="color:var(--accent)" href="https://github.com/bakhod1r/portsentinel/blob/main/CHANGELOG.md">Changelog</a></footer>
+</main></body></html>

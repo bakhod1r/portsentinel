@@ -1,11 +1,11 @@
 name: release
 
 # Releases the version at the top of CHANGELOG.md. Triggered by a v* tag push,
-# or by a push to a release branch: the tag is then created by `gh release create`.
+# or by a push to main: the tag is then created by `gh release create`.
 on:
   push:
     tags: ["v*"]
-    branches: ["main", "claude/nice-gauss-34o74p"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:

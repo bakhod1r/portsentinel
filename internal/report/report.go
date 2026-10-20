@@ -30,7 +30,7 @@ func Table(w io.Writer, r *discovery.Report) {
 		}
 		fmt.Fprintf(tw, "%s\t%d/%s\t%s\t%s\t%s\t%s\n", f.Target, f.Port, f.Proto, dash(f.Service), dash(proc), f.Verdict, f.Reason)
 	}
-	tw.Flush()
+	_ = tw.Flush()
 	if len(r.Findings) == 0 {
 		fmt.Fprintln(w, "No open ports found.")
 	}

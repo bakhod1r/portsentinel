@@ -43,7 +43,7 @@ func (l *Log) Record(action, status string, detail map[string]any, err error) {
 	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	f, ferr := os.OpenFile(l.path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o640)
+	f, ferr := os.OpenFile(l.path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
 	if ferr != nil {
 		return
 	}

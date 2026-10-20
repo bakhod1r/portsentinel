@@ -1,5 +1,7 @@
 # PortSentinel
 
+[![ci](https://github.com/bakhod1r/portsentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/bakhod1r/portsentinel/actions/workflows/ci.yml) [![release](https://img.shields.io/github/v/release/bakhod1r/portsentinel?include_prereleases)](https://github.com/bakhod1r/portsentinel/releases) [![site](https://img.shields.io/badge/site-pages-8b6cf6)](https://bakhod1r.github.io/portsentinel/) [![license](https://img.shields.io/github/license/bakhod1r/portsentinel)](LICENSE)
+
 External port exposure detection and automated nftables enforcement for Linux servers, written in Go.
 
 ## Screenshots
