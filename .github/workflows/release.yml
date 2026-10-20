@@ -1,0 +1,44 @@
+name: release
+
+# Releases the version at the top of CHANGELOG.md. Triggered by a v* tag push,
+# or by a push to a release branch: the tag is then created by `gh release create`.
+on:
+  push:
+    tags: ["v*"]
+    branches: ["main", "claude/nice-gauss-34o74p"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Resolve version
+        id: v
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then tag="$GITHUB_REF_NAME"
+          else tag="v$(grep -m1 -oP '^## \[\K[0-9][^\]]*' CHANGELOG.md)"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.v.outputs.skip != 'true'
+        run: go vet ./... && go test ./...
+      - name: Build
+        if: steps.v.outputs.skip != 'true'
+        run: make dist VERSION=${{ steps.v.outputs.tag }}
+      - name: Publish
+        if: steps.v.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+        run: |
+          awk "/^## \\[${TAG#v}\\]/{f=1;next} /^## \\[/{f=0} f" CHANGELOG.md > RELEASE_NOTES.md
+          gh release create "$TAG" dist/* --target "$GITHUB_SHA" \
+            --title "PortSentinel $TAG" --prerelease --notes-file RELEASE_NOTES.md
