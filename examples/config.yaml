@@ -1,0 +1,19 @@
+# PortSentinel example configuration. Copy to /etc/portsentinel/config.yaml.
+targets: [203.0.113.10]     # only hosts you are authorized to scan
+mode: audit                 # audit | dry-run | enforce | monitor
+backend: nftables
+state_dir: /var/lib/portsentinel
+audit_log: /var/log/portsentinel/audit.jsonl
+rollback_timeout: 60s
+scan:
+  ports: "1-1024,3000,3306,5432,6379,8000,8080,8443,9200,27017"
+  timeout: 800ms
+  concurrency: 256
+  interval: 15m
+  banner: true
+policy:
+  ssh_port: 22
+  allowed_tcp: [80, 443]
+  allowed_ranges: []
+  management_ports: []
+  exceptions: []

@@ -22,15 +22,16 @@ jobs:
           for arch in amd64 arm64; do
             out=portsentinel_${GITHUB_REF_NAME}_linux_${arch}
             CGO_ENABLED=0 GOOS=linux GOARCH=$arch go build -trimpath \
-              -ldflags "-s -w" -o "$out/portsentinel" ./cmd/portsentinel
-            cp README.md LICENSE "$out/" && cp -r deploy "$out/"
+              -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o "$out/portsentinel" ./cmd/portsentinel
+            cp README.md LICENSE CHANGELOG.md "$out/" && cp -r deploy examples "$out/"
             tar -czf "dist/$out.tar.gz" "$out"
           done
           (cd dist && sha256sum *.tar.gz > checksums.txt)
+      - name: Release notes
+        run: awk "/^## \\[${GITHUB_REF_NAME#v}\\]/{f=1;next} /^## \\[/{f=0} f" CHANGELOG.md > RELEASE_NOTES.md
       - name: Publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" dist/* --title "PortSentinel $GITHUB_REF_NAME" \
-            --prerelease --generate-notes \
-            --notes "Early MVP. Use audit/plan/tui modes; apply's same-host verification is a known issue (see README)."
+            --prerelease --notes-file RELEASE_NOTES.md

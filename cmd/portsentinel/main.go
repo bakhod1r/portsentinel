@@ -24,6 +24,9 @@ import (
 	"github.com/bakhod1r/portsentinel/internal/tui"
 )
 
+// version is set at build time via -ldflags "-X main.version=...".
+var version = "dev"
+
 const usage = `PortSentinel — external port exposure detection & firewall enforcement
 
 Usage: portsentinel <command> [flags]
@@ -41,6 +44,7 @@ Commands:
   monitor    run scans periodically
   doctor     diagnose permissions, backend and connectivity
   tui        interactive dashboard
+  version    print version
 
 Global flags:
   -c, --config PATH   configuration file (default /etc/portsentinel/config.yaml)
@@ -49,6 +53,10 @@ Global flags:
 func main() {
 	if len(os.Args) < 2 || os.Args[1] == "-h" || os.Args[1] == "--help" || os.Args[1] == "help" {
 		fmt.Print(usage)
+		return
+	}
+	if os.Args[1] == "version" || os.Args[1] == "--version" {
+		fmt.Println("portsentinel", version)
 		return
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

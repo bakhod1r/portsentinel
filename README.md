@@ -19,7 +19,7 @@ Download a binary from [Releases](https://github.com/bakhod1r/portsentinel/relea
 ## Build
 
 ```sh
-go build -o portsentinel ./cmd/portsentinel
+make build && sudo make install   # or: make dist
 ```
 
 ## Quick start
