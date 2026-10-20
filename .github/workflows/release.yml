@@ -1,8 +1,12 @@
 name: release
 
+# Releases the version at the top of CHANGELOG.md. Triggered by a v* tag push,
+# or by a push to a release branch: the tag is then created by `gh release create`.
 on:
   push:
     tags: ["v*"]
+    branches: ["main", "claude/nice-gauss-34o74p"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,23 +19,26 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: go vet ./... && go test ./...
-      - name: Build
-        run: |
-          mkdir dist
-          for arch in amd64 arm64; do
-            out=portsentinel_${GITHUB_REF_NAME}_linux_${arch}
-            CGO_ENABLED=0 GOOS=linux GOARCH=$arch go build -trimpath \
-              -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" -o "$out/portsentinel" ./cmd/portsentinel
-            cp README.md LICENSE CHANGELOG.md "$out/" && cp -r deploy examples "$out/"
-            tar -czf "dist/$out.tar.gz" "$out"
-          done
-          (cd dist && sha256sum *.tar.gz > checksums.txt)
-      - name: Release notes
-        run: awk "/^## \\[${GITHUB_REF_NAME#v}\\]/{f=1;next} /^## \\[/{f=0} f" CHANGELOG.md > RELEASE_NOTES.md
-      - name: Publish
+      - name: Resolve version
+        id: v
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/* --title "PortSentinel $GITHUB_REF_NAME" \
-            --prerelease --notes-file RELEASE_NOTES.md
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then tag="$GITHUB_REF_NAME"
+          else tag="v$(grep -m1 -oP '^## \[\K[0-9][^\]]*' CHANGELOG.md)"; fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.v.outputs.skip != 'true'
+        run: go vet ./... && go test ./...
+      - name: Build
+        if: steps.v.outputs.skip != 'true'
+        run: make dist VERSION=${{ steps.v.outputs.tag }}
+      - name: Publish
+        if: steps.v.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+        run: |
+          awk "/^## \\[${TAG#v}\\]/{f=1;next} /^## \\[/{f=0} f" CHANGELOG.md > RELEASE_NOTES.md
+          gh release create "$TAG" dist/* --target "$GITHUB_SHA" \
+            --title "PortSentinel $TAG" --prerelease --notes-file RELEASE_NOTES.md
