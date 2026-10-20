@@ -1,0 +1,15 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes: {label: Version, description: "`portsentinel version`"}
+    validations: {required: true}
+  - type: input
+    id: os
+    attributes: {label: Distro / kernel / nft version}
+  - type: textarea
+    id: what
+    attributes: {label: What happened, description: Steps, expected vs actual. Attach `portsentinel doctor` output.}
+    validations: {required: true}

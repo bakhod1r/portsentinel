@@ -1,0 +1,11 @@
+version: "2"
+linters:
+  enable: [errcheck, govet, staticcheck, ineffassign, unused, misspell, gosec]
+  settings:
+    gosec:
+      excludes: [G204, G304] # nft invocation and config paths are intentional
+  exclusions:
+    presets: [std-error-handling]
+    rules:
+      - path: _test\.go
+        linters: [errcheck, gosec]

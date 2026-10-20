@@ -43,7 +43,7 @@ func Listening(procRoot string) ([]Socket, error) {
 			return nil, err
 		}
 		socks, err := ParseProcNet(fh, f.proto)
-		fh.Close()
+		_ = fh.Close()
 		if err != nil {
 			return nil, err
 		}
